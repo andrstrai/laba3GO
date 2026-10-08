@@ -12,6 +12,21 @@ import (
 	"strings"
 )
 
+type CalcFunc func(x, e float64) (float64, uint, error)
+
+type Entry struct {
+	Name  string
+	Fn    CalcFunc
+	Exact func(float64) float64
+}
+
+// СЮДА ВСТАВИТЬ НОВЫЕ ФУНКЦИИ
+var allFuncs = []Entry{
+	{"sin(x)", sinTaylor, math.Sin},
+	{"cos(x)", cosTaylor, math.Cos},
+	{"exp(x)", expTaylor, math.Exp},
+}
+
 // функция для очистки экрана (работает и на Windows, и на macOS/Linux)
 func clearScreen() {
 	var cmd *exec.Cmd
@@ -34,6 +49,7 @@ func sinTaylor(x float64, e float64) (float64, uint, error) {
 		term = -term * x * x / ((2 * k) * (2*k + 1))
 		sum += term
 		k++
+		cnt++
 	}
 	return sum, cnt, nil
 
@@ -66,7 +82,7 @@ func expTaylor(x float64, e float64) (float64, uint, error) {
 		if err != nil {
 			return 0.0, 0, err
 		}
-		return res, cnt, nil
+		return 1 / res, cnt, nil
 	}
 
 	var term float64 = 1
@@ -87,21 +103,24 @@ func expTaylor(x float64, e float64) (float64, uint, error) {
 
 func printTable(x float64, e float64) {
 	fmt.Printf("\n\t\t\t   Сравнительная таблица функций при точности %v\n", e)
-	fmt.Println(strings.Repeat("-", 105))
-	fmt.Printf("%-10s | %-30s | %-30s | %-15s | %-10s\n",
+	fmt.Println(strings.Repeat("-", 115))
+	fmt.Printf("%-20s | %-30s | %-30s | %-15s | %-10s\n",
 		"Функция", "Приближённое", "Точное", "Погрешность", "Итераций")
-	fmt.Println(strings.Repeat("-", 105))
-	approx, iters, err := expTaylor(x, e)
-	if err != nil {
-		fmt.Printf("%-10s | %-30s | %-30s | %-15s | %-10s\n",
-			"e(x)", "ошибка", "ошибка", "ошибка", "ошибка")
-	} else {
-		exact := math.Exp(x)
+	fmt.Println(strings.Repeat("-", 115))
+
+	for _, en := range allFuncs {
+		approx, iters, err := en.Fn(x, e)
+		if err != nil {
+			fmt.Printf("%-20s | %-30s | %-30s | %-15s | %-10s\n",
+				en.Name, "ошибка", "ошибка", "—", "—")
+			continue
+		}
+		exact := en.Exact(x)
 		eps := math.Abs(approx - exact)
-		fmt.Printf("%-10s | %-30v | %-30v | %-15.2e | %d\n",
-			"e(x)", approx, exact, eps, iters)
+		fmt.Printf("%-20s | %-30v | %-30v | %-15.2e | %d\n",
+			en.Name, approx, exact, eps, iters)
 	}
-	fmt.Println(strings.Repeat("-", 105))
+	fmt.Println(strings.Repeat("-", 115))
 
 }
 
