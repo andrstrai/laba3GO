@@ -24,6 +24,7 @@ func clearScreen() {
 }
 
 func sinTaylor(x float64, e float64) float64 {
+	x = math.Mod(x, 2*math.Pi)
 	var term float64 = 1 * (math.Pow(x, 2*0+1))
 	var d float64 = 0
 	var sum float64 = term
@@ -39,6 +40,7 @@ func sinTaylor(x float64, e float64) float64 {
 }
 
 func cosTaylor(x float64, e float64) float64 {
+	x = math.Mod(x, 2*math.Pi)
 	var term float64 = 1
 	var last float64 = 0
 	sum := term
@@ -47,6 +49,21 @@ func cosTaylor(x float64, e float64) float64 {
 	for math.Abs(term-last) >= e {
 		last = term
 		term = -term * x * x / (2*n - 1) / (2 * n)
+		sum += term
+		n++
+	}
+	return sum
+}
+
+func expTaylor(x float64, e float64) float64 {
+	var term float64 = 1
+	var last float64 = 0
+	sum := term
+	n := 1.0
+
+	for math.Abs(term-last) >= e {
+		last = term
+		term = term * x / n
 		sum += term
 		n++
 	}
@@ -113,7 +130,9 @@ A:
 					fmt.Println("Точность: ", eVal)
 					fmt.Println("cos(", xVal, ") = ", cosTaylor(xVal, eVal))
 				case 3:
-					//функция Расчёт функции exp(x) по формуле Тейлора
+					fmt.Println("Функция exp(x) по формуле Тейлора: ")
+					fmt.Println("Точность: ", eVal)
+					fmt.Println("exp(", xVal, ") = ", expTaylor(xVal, eVal))
 				case 4:
 					//функция Расчёт числа π с помощью ряда Лейбница
 				case 5:
