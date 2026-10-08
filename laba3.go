@@ -38,6 +38,21 @@ func sinTaylor(x float64, e float64) float64 {
 
 }
 
+func cosTaylor(x float64, e float64) float64 {
+	var term float64 = 1
+	var last float64 = 0
+	sum := term
+	n := 1.0
+
+	for math.Abs(term-last) >= e {
+		last = term
+		term = -term * x * x / (2*n - 1) / (2 * n)
+		sum += term
+		n++
+	}
+	return sum
+}
+
 // основная функция
 func main() {
 	reader := bufio.NewReader(os.Stdin)
@@ -94,7 +109,9 @@ A:
 					fmt.Println("Точность: ", eVal)
 					fmt.Println("sin(", xVal, ") = ", sinTaylor(xVal, eVal))
 				case 2:
-					//функция Расчёт функции cos(x) по формуле Тейлора
+					fmt.Println("Функция cos(x) по формуле Тейлора: ")
+					fmt.Println("Точность: ", eVal)
+					fmt.Println("cos(", xVal, ") = ", cosTaylor(xVal, eVal))
 				case 3:
 					//функция Расчёт функции exp(x) по формуле Тейлора
 				case 4:
