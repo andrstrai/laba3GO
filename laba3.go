@@ -38,7 +38,8 @@ func sinTaylor(x float64, e float64) float64 {
 
 }
 
-func cosTaylor(x float64, e float64) float64 {
+func cosTaylor(x float64, e float64) (float64, uint, error) {
+	var cnt uint = 0
 	x = math.Mod(x, 2*math.Pi)
 	var term float64 = 1
 	sum := term
@@ -48,28 +49,29 @@ func cosTaylor(x float64, e float64) float64 {
 		term = -term * x * x / (2*n - 1) / (2 * n)
 		sum += term
 		n++
+		cnt++
 	}
-	return sum
+	return sum, cnt, nil
 }
 
-func expTaylor(x float64, e float64) ([]float64, error) {
+func expTaylor(x float64, e float64) (float64, uint, error) {
 	if math.Abs(x) > 700 {
-		return []float64{0.0, 0.0}, errors.New("Ошибка: значение модуля аргумента слишком велико, выйдите в меню" +
+		return 0.0, 0, errors.New("Ошибка: значение модуля аргумента слишком велико, выйдите в меню" +
 			" и установите его в пределах от -700 до 700")
 	}
 
 	if x < 0 {
-		res, err := expTaylor(-x, e)
+		res, cnt, err := expTaylor(-x, e)
 		if err != nil {
-			return []float64{0.0, 0.0}, err
+			return 0.0, 0, err
 		}
-		return []float64{1 / res[0], res[1]}, nil
+		return res, cnt, nil
 	}
 
 	var term float64 = 1
 	sum := term
 	n := 1.0
-	var cnt float64 = 0
+	var cnt uint = 0
 
 	for math.Abs(term) >= e {
 		term = term * x / n
@@ -79,7 +81,7 @@ func expTaylor(x float64, e float64) ([]float64, error) {
 	}
 	term = term * x / n
 	sum += term
-	return []float64{sum, cnt}, nil
+	return sum, cnt, nil
 }
 
 func printTable(x float64, e float64) {
@@ -88,16 +90,15 @@ func printTable(x float64, e float64) {
 	fmt.Printf("%-10s | %-30s | %-30s | %-15s | %-10s\n",
 		"Функция", "Приближённое", "Точное", "Погрешность", "Итераций")
 	fmt.Println(strings.Repeat("-", 105))
-	approx, err := expTaylor(x, e)
+	approx, iters, err := expTaylor(x, e)
 	if err != nil {
 		fmt.Printf("%-10s | %-30s | %-30s | %-15s | %-10s\n",
 			"e(x)", "ошибка", "ошибка", "ошибка", "ошибка")
 	} else {
 		exact := math.Exp(x)
-		eps := math.Abs(approx[0] - exact)
-		iters := approx[1]
-		fmt.Printf("%-10s | %-30v | %-30v | %-15.2e | %-10.0f\n",
-			"e(x)", approx[0], exact, eps, iters)
+		eps := math.Abs(approx - exact)
+		fmt.Printf("%-10s | %-30v | %-30v | %-15.2e | %d\n",
+			"e(x)", approx, exact, eps, iters)
 	}
 	fmt.Println(strings.Repeat("-", 105))
 
@@ -160,17 +161,18 @@ A:
 					fmt.Println("Точность: ", eVal)
 					fmt.Println("sin(", xVal, ") = ", sinTaylor(xVal, eVal))
 				case 2:
+					cos, _, _ := cosTaylor(xVal, eVal)
 					fmt.Println("Функция cos(x) по формуле Тейлора: ")
 					fmt.Println("Точность: ", eVal)
-					fmt.Println("cos(", xVal, ") = ", cosTaylor(xVal, eVal))
+					fmt.Println("cos(", xVal, ") = ", cos)
 				case 3:
-					exp, err := expTaylor(xVal, eVal)
+					exp, _, err := expTaylor(xVal, eVal)
 					if err != nil {
 						fmt.Println(err)
 					} else {
 						fmt.Println("Функция exp(x) по формуле Тейлора: ")
 						fmt.Println("Точность: ", eVal)
-						fmt.Println("exp(", xVal, ") = ", exp[0])
+						fmt.Println("exp(", xVal, ") = ", exp)
 					}
 				case 4:
 					//функция Расчёт числа π с помощью ряда Лейбница
