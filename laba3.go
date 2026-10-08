@@ -25,6 +25,7 @@ func clearScreen() {
 }
 
 func sinTaylor(x float64, e float64) float64 {
+	x = math.Mod(x, 2*math.Pi)
 	var term float64 = 1 * (math.Pow(x, 2*0+1))
 	var sum float64 = term
 	var k float64 = 1
