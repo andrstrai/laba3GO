@@ -97,8 +97,6 @@ func expTaylor(x float64, e float64) (float64, uint, error) {
 		n++
 		cnt++
 	}
-	term = term * x / n
-	sum += term
 	return sum, cnt, nil
 }
 
