@@ -135,7 +135,9 @@ A:
 					fmt.Println("Точность: ", eVal)
 					fmt.Println("sin(", xVal, ") = ", sinTaylor(xVal, eVal))
 				case 2:
-					//функция Расчёт функции cos(x) по формуле Тейлора
+					fmt.Println("Функция cos(x) по формуле Тейлора: ")
+					fmt.Println("Точность: ", eVal)
+					fmt.Println("cos(", xVal, ") = ", cosTaylor(xVal, eVal))
 				case 3:
 					exp, err := expTaylor(xVal, eVal)
 					if err != nil {
