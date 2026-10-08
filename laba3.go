@@ -52,32 +52,55 @@ func cosTaylor(x float64, e float64) float64 {
 	return sum
 }
 
-func expTaylor(x float64, e float64) (float64, error) {
+func expTaylor(x float64, e float64) ([]float64, error) {
 	if math.Abs(x) > 700 {
-		return 0, errors.New("Ошибка: значение модуля аргумента слишком велико, выйдите в меню" +
+		return []float64{0.0, 0.0}, errors.New("Ошибка: значение модуля аргумента слишком велико, выйдите в меню" +
 			" и установите его в пределах от -700 до 700")
 	}
 
 	if x < 0 {
 		res, err := expTaylor(-x, e)
 		if err != nil {
-			return 0, err
+			return []float64{0.0, 0.0}, err
 		}
-		return 1 / res, nil
+		return []float64{1 / res[0], res[1]}, nil
 	}
 
 	var term float64 = 1
 	sum := term
 	n := 1.0
+	var cnt float64 = 0
 
 	for math.Abs(term) >= e {
 		term = term * x / n
 		sum += term
 		n++
+		cnt++
 	}
 	term = term * x / n
 	sum += term
-	return sum, nil
+	return []float64{sum, cnt}, nil
+}
+
+func printTable(x float64, e float64) {
+	fmt.Printf("\n\t\t\t   Сравнительная таблица функций при точности %v\n", e)
+	fmt.Println(strings.Repeat("-", 105))
+	fmt.Printf("%-10s | %-30s | %-30s | %-15s | %-10s\n",
+		"Функция", "Приближённое", "Точное", "Погрешность", "Итераций")
+	fmt.Println(strings.Repeat("-", 105))
+	approx, err := expTaylor(x, e)
+	if err != nil {
+		fmt.Printf("%-10s | %-30s | %-30s | %-15s | %-10s\n",
+			"e(x)", "ошибка", "ошибка", "ошибка", "ошибка")
+	} else {
+		exact := math.Exp(x)
+		eps := math.Abs(approx[0] - exact)
+		iters := approx[1]
+		fmt.Printf("%-10s | %-30v | %-30v | %-15.2e | %-10.0f\n",
+			"e(x)", approx[0], exact, eps, iters)
+	}
+	fmt.Println(strings.Repeat("-", 105))
+
 }
 
 // основная функция
@@ -117,6 +140,7 @@ A:
 				fmt.Println("4 - Расчёт числа π с помощью ряда Лейбница")
 				fmt.Println("5 - Расчёт числа π с помощью ряда Нилакана")
 				fmt.Println("6 - Расчёт числа е с помощью ряда Тейлора")
+				fmt.Println("7 - Вывести таблицу со всей статистикой")
 				fmt.Println("0 - Выйти из меню команд")
 				fmt.Println("Выберите пункт из меню управления: ")
 
@@ -146,7 +170,7 @@ A:
 					} else {
 						fmt.Println("Функция exp(x) по формуле Тейлора: ")
 						fmt.Println("Точность: ", eVal)
-						fmt.Println("exp(", xVal, ") = ", exp)
+						fmt.Println("exp(", xVal, ") = ", exp[0])
 					}
 				case 4:
 					//функция Расчёт числа π с помощью ряда Лейбница
@@ -154,6 +178,8 @@ A:
 					//функция Расчёт числа π с помощью ряда Нилакана
 				case 6:
 					//функция Расчёт числа е с помощью ряда Тейлора
+				case 7:
+					printTable(xVal, eVal)
 				default:
 					fmt.Println("Нет такого пункта меню!")
 				}
