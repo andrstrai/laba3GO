@@ -24,7 +24,8 @@ func clearScreen() {
 	cmd.Run()
 }
 
-func sinTaylor(x float64, e float64) float64 {
+func sinTaylor(x float64, e float64) (float64, uint, error) {
+	var cnt uint = 0
 	x = math.Mod(x, 2*math.Pi)
 	var term float64 = 1 * (math.Pow(x, 2*0+1))
 	var sum float64 = term
@@ -34,7 +35,7 @@ func sinTaylor(x float64, e float64) float64 {
 		sum += term
 		k++
 	}
-	return sum
+	return sum, cnt, nil
 
 }
 
@@ -157,9 +158,10 @@ A:
 				case 0:
 					continue A
 				case 1:
+					sin, _, _ := sinTaylor(xVal, eVal)
 					fmt.Println("Функция sin(x) по формуле Тейлора: ")
 					fmt.Println("Точность: ", eVal)
-					fmt.Println("sin(", xVal, ") = ", sinTaylor(xVal, eVal))
+					fmt.Println("sin(", xVal, ") = ", sin)
 				case 2:
 					cos, _, _ := cosTaylor(xVal, eVal)
 					fmt.Println("Функция cos(x) по формуле Тейлора: ")
