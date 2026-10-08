@@ -20,7 +20,8 @@ type Entry struct {
 	Exact func(float64) float64
 }
 
-// СЮДА ВСТАВИТЬ НОВЫЕ ФУНКЦИИ
+// СЮДА ВСТАВИТЬ НОВЫЕ ФУНКЦИИ ПО ШАБЛОНУ "ИМЯ, ФУНКЦИЯ, ТОЧНАЯ ФУНКЦИЯ (ВОТ ЗДЕСЬ ВИДИМО ПРОБЛЕМЫ БУДУТ С ПИ)"
+// ТВОИ ФУНКЦИИ ДОЛЖНЫ ВОЗВРАЩАТЬ float64, uint, error
 var allFuncs = []Entry{
 	{"sin(x)", sinTaylor, math.Sin},
 	{"cos(x)", cosTaylor, math.Cos},
@@ -115,6 +116,7 @@ func printTable(x float64, e float64) {
 				en.Name, "ошибка", "ошибка", "—", "—")
 			continue
 		}
+		// ЗДЕСЬ СДЕЛАЙ ПРОВЕРКУ НА ИМЯ, Т.К. У ТЕБЯ ТОЧНОЕ ЗНАЧЕНИЕ ДЛЯ ПИ И en.Exact(x) ОШИБКУ ВЫДАСТ
 		exact := en.Exact(x)
 		eps := math.Abs(approx - exact)
 		fmt.Printf("%-20s | %-30v | %-30v | %-15.2e | %d\n",
