@@ -167,8 +167,13 @@ func eSeries(_ float64, e float64) (float64, uint, error) {
 func printResult(name string, approx, exact float64, iters uint, e float64) {
 	fmt.Println(name)
 	fmt.Printf("Точность ε:          %v\n", e)
-	fmt.Printf("Приближённое:        %.15f\n", approx)
-	fmt.Printf("Точное (пакет math): %.15f\n", exact)
+	if name == "exp(x)" {
+		fmt.Printf("Приближённое:        %v\n", approx)
+		fmt.Printf("Точное (пакет math): %v\n", exact)
+	} else {
+		fmt.Printf("Приближённое:        %.15f\n", approx)
+		fmt.Printf("Точное (пакет math): %.15f\n", exact)
+	}
 	fmt.Printf("Погрешность:         %.2e\n", math.Abs(approx-exact))
 	fmt.Printf("Итераций:            %d\n", iters)
 }
